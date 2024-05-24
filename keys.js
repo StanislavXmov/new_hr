@@ -17,7 +17,13 @@ export const MaxBonus = 'Max bonus';
 export const Benefits = 'Benefits';
 export const SalaryFinal = 'Salary final';
 
-export const teamlead = "тимлид";
-export const senior = "сеньор";
-export const middle = "миддл";
-export const junior = "джун";
+export const grades = {
+  teamlead: "тимлид",
+  senior: "сеньор",
+  middle: "миддл",
+  junior: "джун",
+}
+// export const teamlead = "тимлид";
+// export const senior = "сеньор";
+// export const middle = "миддл";
+// export const junior = "джун";

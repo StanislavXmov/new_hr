@@ -1,5 +1,5 @@
 import * as d3 from 'd3';
-import { Grade, SalaryFinal, junior, middle, senior, teamlead } from './keys';
+import { Grade, SalaryFinal, grades } from './keys';
 import './style.scss';
 
 const month = ['Январь' , 'Февраль' , 'Март' , 'Апрель' , 'Май' , 'Июнь' , 'Июль' , 'Август' , 'Сентябрь' , 'Октябрь' , 'Ноябрь' , 'Декабрь'];
@@ -29,6 +29,7 @@ const getSalary = (d) => {
 }
 
 let data;
+let svg;
 let gradeFilter = null;
 let currencyFilter = null;
 let fieldFilter = null;
@@ -64,15 +65,43 @@ const clearRect = () => {
 
 const getGradeData = (data, grade) => {
   const filtered = data.filter(d => d[Grade] === grade);
-  console.log(filtered);
   return filtered;
 }
 
 const setGradeData = (data) => {
-  teamleadInfo.textContent = getGradeData(data, teamlead).length;
-  seniorInfo.textContent = getGradeData(data, senior).length;
-  middleInfo.textContent = getGradeData(data, middle).length;
-  juniorInfo.textContent = getGradeData(data, junior).length;
+  teamleadInfo.textContent = getGradeData(data, grades.teamlead).length;
+  seniorInfo.textContent = getGradeData(data, grades.senior).length;
+  middleInfo.textContent = getGradeData(data, grades.middle).length;
+  juniorInfo.textContent = getGradeData(data, grades.junior).length;
+}
+
+const setGradeFilter = (e) => {
+  const grade = e.target.dataset.grade;
+  if (gradeFilter !== grade) {
+    gradeFilter = grade;
+  } else {
+    gradeFilter = null;
+  }
+  const elements = document.querySelectorAll(`[data-grade]`); 
+  if (gradeFilter) {
+    elements.forEach(e => e.classList.add('notActive'));
+    const activeElements = document.querySelectorAll(`[data-grade=${gradeFilter}]`);
+    activeElements.forEach(e => e.classList.remove('notActive'));
+  } else {
+    elements.forEach(e => e.classList.remove('notActive'));
+  }
+
+  setFilteredData(data);
+}
+
+const setFilteredData = (data) => {
+  let filtered = data;
+  if (gradeFilter) {
+    filtered = getGradeData(data, grades[gradeFilter]);
+  }
+
+  clearRect();
+  setRect(svg, filtered);
 }
 
 const setRect = (svg, data) => {
@@ -103,7 +132,7 @@ export const getCsv = async () => {
     getSalary(d);
   });
 
-  const svg = d3.select("#graph1")
+  svg = d3.select("#graph1")
     .append("svg")
       .attr("width", width + margin.left + margin.right)
       .attr("height", height + margin.top + margin.bottom)
@@ -139,7 +168,12 @@ export const getCsv = async () => {
   // data
   setGradeData(data);
 
-  // test
-  // clearRect();
+
+  // UI
+  teamleadButton.addEventListener('click', setGradeFilter);
+  seniorButton.addEventListener('click', setGradeFilter);
+  middleButton.addEventListener('click', setGradeFilter);
+  juniorButton.addEventListener('click', setGradeFilter);
+
 }
 
