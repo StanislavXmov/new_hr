@@ -1,0 +1,145 @@
+import * as d3 from 'd3';
+import { Grade, SalaryFinal, junior, middle, senior, teamlead } from './keys';
+import './style.scss';
+
+const month = ['Январь' , 'Февраль' , 'Март' , 'Апрель' , 'Май' , 'Июнь' , 'Июль' , 'Август' , 'Сентябрь' , 'Октябрь' , 'Ноябрь' , 'Декабрь'];
+const getMonth = (d) => Number(d.Month.split('.')[1]);
+const salaries = {};
+
+for (let i = 1; i < 21; i++) {
+  salaries[i * 20] = {
+    s: i * 20 * 1000,
+    id: i,
+  }
+}
+
+const getSalary = (d) => {
+  const str = d[SalaryFinal].trim().split('₽')[1].replace(' ', '');
+  const salary = Number(str);
+  
+  for (const key in salaries) {
+    if (salary < salaries[key].s) {
+      d.salary = salaries[Number(key) - 20];
+      break;
+    } else if (salary === salaries[key].s) {
+      d.salary = salaries[key];
+      break;
+    }
+  }
+}
+
+let data;
+let gradeFilter = null;
+let currencyFilter = null;
+let fieldFilter = null;
+let formatFilter = null;
+let workingFilter = null;
+
+const teamleadButton = document.getElementById('teamleadButton');
+const teamleadInfo = document.getElementById('teamlead');
+const teamleadMedian = document.getElementById('teamleadMedian');
+const seniorButton = document.getElementById('seniorButton');
+const seniorInfo = document.getElementById('senior');
+const seniorMedian = document.getElementById('seniorMedian');
+const middleButton = document.getElementById('middleButton');
+const middleInfo = document.getElementById('middle');
+const middleMedian = document.getElementById('middleMedian');
+const juniorButton = document.getElementById('juniorButton');
+const juniorInfo = document.getElementById('junior');
+const juniorMedian = document.getElementById('juniorMedian');
+
+
+const margin = {top: 20, right: 25, bottom: 20, left: 40};
+const width = 884 - margin.left - margin.right;
+const height = 480 - margin.top - margin.bottom;
+
+const axis = {
+  x: null,
+  y: null,
+}
+
+const clearRect = () => {
+  d3.selectAll(`[data-rect]`).remove();
+}
+
+const getGradeData = (data, grade) => {
+  const filtered = data.filter(d => d[Grade] === grade);
+  console.log(filtered);
+  return filtered;
+}
+
+const setGradeData = (data) => {
+  teamleadInfo.textContent = getGradeData(data, teamlead).length;
+  seniorInfo.textContent = getGradeData(data, senior).length;
+  middleInfo.textContent = getGradeData(data, middle).length;
+  juniorInfo.textContent = getGradeData(data, junior).length;
+}
+
+const setRect = (svg, data) => {
+  svg.selectAll()
+    .data(data)
+    .enter()
+    .append("rect")
+      .attr("data-rect", true)
+      .attr("x", d => axis.x(d.date))
+      .attr("y", d => axis.y(d.salary.s / 1000))
+      // .attr("data-salary",d => d.salary.s)
+      .attr("width", axis.x.bandwidth() )
+      .attr("height", axis.y.bandwidth() )
+      .style("fill", d => '#c1c1c1')
+      .style("stroke-width", 4)
+      .style("stroke", "none")
+      .style("opacity", 0.4);
+}
+
+export const getCsv = async () => {
+  data = await d3.csv('./Dataset HR - XYZ разработчик 2023 год.csv');
+  data.sort((a, b) => getMonth(a) - getMonth(b));
+  console.log(data);
+
+  data.forEach(d => {
+    const m = getMonth(d);
+    d.date = month[m - 1];
+    getSalary(d);
+  });
+
+  const svg = d3.select("#graph1")
+    .append("svg")
+      .attr("width", width + margin.left + margin.right)
+      .attr("height", height + margin.top + margin.bottom)
+    .append("g")
+      .attr("transform", `translate(${margin.left},${margin.top})`);
+
+  const dates = d3.map(data, d => d.date);
+  const salary = d3.map(Object.entries(salaries), s => s[1].s / 1000);
+  
+  const x = d3.scaleBand()
+    .range([ 0, width ])
+    .domain(dates)
+    .padding(0);
+  svg.append("g")
+    .style("font-size", 12)
+    .attr("transform", `translate(0,${height})`)
+    .call(d3.axisBottom(x).tickSize(0))
+    .select(".domain").remove();
+  axis.x = x;
+
+  const y = d3.scaleBand()
+    .range([ height, 0 ])
+    .domain(salary)
+    .padding(0);
+  svg.append("g")
+    .style("font-size", 12)
+    .call(d3.axisLeft(y).tickSize(0))
+    .select(".domain").remove();
+  axis.y = y;
+
+  setRect(svg, data);
+
+  // data
+  setGradeData(data);
+
+  // test
+  // clearRect();
+}
+

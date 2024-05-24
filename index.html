@@ -1,0 +1,41 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>NewHR</title>
+  </head>
+  <body>
+    <div class="wrapper">
+      <div class="graph">
+        <div id="graph1"></div>
+      </div>
+      <div class="data">
+        <div class="dataWrapper">
+          <div class="dataColumn">
+            <h3 class="dataTitle">Грейды</h3>
+            <button id="teamleadButton" class="dataTitleButton">Тимлиды</button>
+            <button id="seniorButton" class="dataTitleButton">Сеньеры</button>
+            <button id="middleButton" class="dataTitleButton">Миддлы</button>
+            <button id="juniorButton" class="dataTitleButton">Джуны</button>
+          </div>
+          <div class="dataColumn">
+            <span class="dataDesc">кол-во</span>
+            <span id="teamlead">0</span>
+            <span id="senior">0</span>
+            <span id="middle">0</span>
+            <span id="junior">0</span>
+          </div>
+          <div class="dataColumn">
+            <span class="dataDesc">медиана зп</span>
+            <span id="teamleadMedian">0</span>
+            <span id="seniorMedian">0</span>
+            <span id="middleMedian">0</span>
+            <span id="juniorMedian">0</span>
+          </div>
+        </div>
+      </div>
+    </div>
+    <script type="module" src="./index.js"></script>
+  </body>
+</html>

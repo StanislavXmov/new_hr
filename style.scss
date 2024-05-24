@@ -1,0 +1,62 @@
+* {
+  box-sizing: border-box;
+}
+
+body {
+  margin: 0px auto;
+  padding: 16px;
+  /* width: 1200px; */
+  min-height: 100vh;
+  font-family: sans-serif;
+}
+
+.wrapper {
+  margin: 0px auto;
+  width: 1200px;
+  height: 600px;
+  display: grid;
+  grid-template-columns: 884px 300px;
+  gap: 16px;
+}
+
+.graph {
+  border: 1px solid #000000;
+}
+
+.data {
+  border: 1px solid #000000;
+}
+
+.dataWrapper {
+  display: grid;
+  grid-template-columns: 2fr 1fr 2fr;
+}
+
+.dataColumn {
+  display: grid;
+  grid-template-rows: 16px 16px 16px;
+  gap: 4px;
+
+  & span {
+    font-size: 14px;
+  }
+}
+
+.dataTitle {
+  margin: 0px;
+  font-size: 14px;
+}
+
+.dataTitleButton {
+  padding: 0px;
+  background: none;
+  border: none;
+  outline: none;
+  cursor: pointer;
+
+  text-align: left;
+}
+
+.dataDesc {
+  font-size: 14px;
+}
