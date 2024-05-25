@@ -23,7 +23,10 @@ export const grades = {
   middle: "миддл",
   junior: "джун",
 }
-// export const teamlead = "тимлид";
-// export const senior = "сеньор";
-// export const middle = "миддл";
-// export const junior = "джун";
+
+export const currency = {
+  rub: "рубли",
+  euro: "евро",
+  dram: "Драмы",
+  crypt: "криптовалююта",
+}

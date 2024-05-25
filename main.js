@@ -1,5 +1,5 @@
 import * as d3 from 'd3';
-import { Grade, SalaryFinal, grades } from './keys';
+import { Currency, Grade, SalaryFinal, currency, grades } from './keys';
 import './style.scss';
 
 const month = ['Январь' , 'Февраль' , 'Март' , 'Апрель' , 'Май' , 'Июнь' , 'Июль' , 'Август' , 'Сентябрь' , 'Октябрь' , 'Ноябрь' , 'Декабрь'];
@@ -49,6 +49,19 @@ const juniorButton = document.getElementById('juniorButton');
 const juniorInfo = document.getElementById('junior');
 const juniorMedian = document.getElementById('juniorMedian');
 
+const rubButton = document.getElementById('rubButton');
+const rubInfo = document.getElementById('rub');
+const rubMedian = document.getElementById('rubMedian');
+const euroButton = document.getElementById('euroButton');
+const euroInfo = document.getElementById('euro');
+const euroMedian = document.getElementById('euroMedian');
+const dramButton = document.getElementById('dramButton');
+const dramInfo = document.getElementById('dram');
+const dramMedian = document.getElementById('dramMedian');
+const cryptButton = document.getElementById('cryptButton');
+const cryptInfo = document.getElementById('crypt');
+const cryptMedian = document.getElementById('cryptMedian');
+
 
 const margin = {top: 20, right: 25, bottom: 20, left: 40};
 const width = 884 - margin.left - margin.right;
@@ -68,11 +81,23 @@ const getGradeData = (data, grade) => {
   return filtered;
 }
 
+const getCurrencyData = (data, currency) => {
+  const filtered = data.filter(d => d[Currency] === currency);
+  return filtered;
+}
+
 const setGradeData = (data) => {
   teamleadInfo.textContent = getGradeData(data, grades.teamlead).length;
   seniorInfo.textContent = getGradeData(data, grades.senior).length;
   middleInfo.textContent = getGradeData(data, grades.middle).length;
   juniorInfo.textContent = getGradeData(data, grades.junior).length;
+}
+
+const setCurrencyData = (data) => {
+  rubInfo.textContent = getCurrencyData(data, currency.rub).length;
+  euroInfo.textContent = getCurrencyData(data, currency.euro).length;
+  dramInfo.textContent = getCurrencyData(data, currency.dram).length;
+  cryptInfo.textContent = getCurrencyData(data, currency.crypt).length;
 }
 
 const setGradeFilter = (e) => {
@@ -94,10 +119,32 @@ const setGradeFilter = (e) => {
   setFilteredData(data);
 }
 
+const setCurrencyFilter = (e) => {
+  const currency = e.target.dataset.currency;
+  if (currencyFilter !== currency) {
+    currencyFilter = currency;
+  } else {
+    currencyFilter = null;
+  }
+  const elements = document.querySelectorAll(`[data-currency]`); 
+  if (currencyFilter) {
+    elements.forEach(e => e.classList.add('notActive'));
+    const activeElements = document.querySelectorAll(`[data-currency=${currencyFilter}]`);
+    activeElements.forEach(e => e.classList.remove('notActive'));
+  } else {
+    elements.forEach(e => e.classList.remove('notActive'));
+  }
+
+  setFilteredData(data);
+}
+
 const setFilteredData = (data) => {
   let filtered = data;
   if (gradeFilter) {
-    filtered = getGradeData(data, grades[gradeFilter]);
+    filtered = getGradeData(filtered, grades[gradeFilter]);
+  }
+  if (currencyFilter) {
+    filtered = getCurrencyData(filtered, currency[currencyFilter]);
   }
 
   clearRect();
@@ -167,13 +214,18 @@ export const getCsv = async () => {
 
   // data
   setGradeData(data);
-
+  setCurrencyData(data);
 
   // UI
   teamleadButton.addEventListener('click', setGradeFilter);
   seniorButton.addEventListener('click', setGradeFilter);
   middleButton.addEventListener('click', setGradeFilter);
   juniorButton.addEventListener('click', setGradeFilter);
+
+  rubButton.addEventListener('click', setCurrencyFilter);
+  euroButton.addEventListener('click', setCurrencyFilter);
+  dramButton.addEventListener('click', setCurrencyFilter);
+  cryptButton.addEventListener('click', setCurrencyFilter);
 
 }
 
