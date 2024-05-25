@@ -147,6 +147,9 @@ const setFilteredData = (data) => {
     filtered = getCurrencyData(filtered, currency[currencyFilter]);
   }
 
+  setGradeData(filtered);
+  setCurrencyData(filtered);
+
   clearRect();
   setRect(svg, filtered);
 }
