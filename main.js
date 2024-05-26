@@ -1,5 +1,5 @@
 import * as d3 from 'd3';
-import { Currency, Grade, SalaryFinal, currency, grades } from './keys';
+import { Currency, Grade, Month, SalaryFinal, currency, grades } from './keys';
 import './style.scss';
 
 const month = ['Январь' , 'Февраль' , 'Март' , 'Апрель' , 'Май' , 'Июнь' , 'Июль' , 'Август' , 'Сентябрь' , 'Октябрь' , 'Ноябрь' , 'Декабрь'];
@@ -74,6 +74,7 @@ const axis = {
 
 const clearRect = () => {
   d3.selectAll(`[data-rect]`).remove();
+  d3.selectAll(`[data-median]`).remove();
 }
 
 const getGradeData = (data, grade) => {
@@ -169,6 +170,31 @@ const setRect = (svg, data) => {
       .style("stroke-width", 4)
       .style("stroke", "none")
       .style("opacity", 0.4);
+
+  const dataMapedObject = {};
+
+  data.forEach(d => {
+    if (dataMapedObject[d.date]) {
+      dataMapedObject[d.date].value += d.salary.s;
+      dataMapedObject[d.date].counter++;
+    } else {
+      dataMapedObject[d.date] = {
+        value: d.salary.s,
+        counter: 1,
+      }
+    }
+  });
+
+  svg.append("path")
+      .datum(Object.entries(dataMapedObject))
+      .attr("data-median", true)
+      .attr("fill", "none")
+      .attr("stroke", "black")
+      .attr("stroke-width", 2)
+      .attr("d", d3.line()
+        .x(d => axis.x(d[0]) + 34.125)
+        .y(d => axis.yLinear(d[1].value / d[1].counter / 1000))
+        );
 }
 
 export const getCsv = async () => {
@@ -191,6 +217,7 @@ export const getCsv = async () => {
 
   const dates = d3.map(data, d => d.date);
   const salary = d3.map(Object.entries(salaries), s => s[1].s / 1000);
+  // console.log(dates, salary);
   
   const x = d3.scaleBand()
     .range([ 0, width ])
@@ -212,6 +239,11 @@ export const getCsv = async () => {
     .call(d3.axisLeft(y).tickSize(0))
     .select(".domain").remove();
   axis.y = y;
+
+  const yLinear = d3.scaleLinear()
+      .domain([0, 400])
+      .range([ height, 0 ]);
+  axis.yLinear = yLinear;
 
   setRect(svg, data);
 
