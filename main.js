@@ -1,5 +1,5 @@
 import * as d3 from 'd3';
-import { Currency, Grade, Month, SalaryFinal, currency, grades } from './keys';
+import { Currency, Grade, Month, SalaryFinal, Working, currency, grades, working } from './keys';
 import './style.scss';
 
 const month = ['Январь' , 'Февраль' , 'Март' , 'Апрель' , 'Май' , 'Июнь' , 'Июль' , 'Август' , 'Сентябрь' , 'Октябрь' , 'Ноябрь' , 'Декабрь'];
@@ -62,6 +62,16 @@ const cryptButton = document.getElementById('cryptButton');
 const cryptInfo = document.getElementById('crypt');
 const cryptMedian = document.getElementById('cryptMedian');
 
+const officeButton = document.getElementById('officeButton');
+const officeInfo = document.getElementById('office');
+const officeMedian = document.getElementById('officeMedian');
+const hybridButton = document.getElementById('hybridButton');
+const hybridInfo = document.getElementById('hybrid');
+const hybridMedian = document.getElementById('hybridMedian');
+const remoteButton = document.getElementById('remoteButton');
+const remoteInfo = document.getElementById('remote');
+const remoteMedian = document.getElementById('remoteMedian');
+
 
 const margin = {top: 20, right: 25, bottom: 20, left: 40};
 const width = 884 - margin.left - margin.right;
@@ -87,6 +97,11 @@ const getCurrencyData = (data, currency) => {
   return filtered;
 }
 
+const getWorkingData = (data, grade) => {
+  const filtered = data.filter(d => d[Working].toLowerCase() === grade);
+  return filtered;
+}
+
 const setGradeData = (data) => {
   teamleadInfo.textContent = getGradeData(data, grades.teamlead).length;
   seniorInfo.textContent = getGradeData(data, grades.senior).length;
@@ -99,6 +114,12 @@ const setCurrencyData = (data) => {
   euroInfo.textContent = getCurrencyData(data, currency.euro).length;
   dramInfo.textContent = getCurrencyData(data, currency.dram).length;
   cryptInfo.textContent = getCurrencyData(data, currency.crypt).length;
+}
+
+const setWorkingData = (data) => {
+  officeInfo.textContent = getWorkingData(data, working.office).length;
+  hybridInfo.textContent = getWorkingData(data, working.hybrid).length;
+  remoteInfo.textContent = getWorkingData(data, working.remote).length;
 }
 
 const setGradeFilter = (e) => {
@@ -139,6 +160,25 @@ const setCurrencyFilter = (e) => {
   setFilteredData(data);
 }
 
+const setWorkingFilter = (e) => {
+  const working = e.target.dataset.working;
+  if (workingFilter !== working) {
+    workingFilter = working;
+  } else {
+    workingFilter = null;
+  }
+  const elements = document.querySelectorAll(`[data-working]`); 
+  if (workingFilter) {
+    elements.forEach(e => e.classList.add('notActive'));
+    const activeElements = document.querySelectorAll(`[data-working=${workingFilter}]`);
+    activeElements.forEach(e => e.classList.remove('notActive'));
+  } else {
+    elements.forEach(e => e.classList.remove('notActive'));
+  }
+
+  setFilteredData(data);
+}
+
 const setFilteredData = (data) => {
   let filtered = data;
   if (gradeFilter) {
@@ -147,9 +187,13 @@ const setFilteredData = (data) => {
   if (currencyFilter) {
     filtered = getCurrencyData(filtered, currency[currencyFilter]);
   }
+  if (workingFilter) {
+    filtered = getWorkingData(filtered, working[workingFilter]);
+  }
 
   setGradeData(filtered);
   setCurrencyData(filtered);
+  setWorkingData(filtered);
 
   clearRect();
   setRect(svg, filtered);
@@ -250,6 +294,7 @@ export const getCsv = async () => {
   // data
   setGradeData(data);
   setCurrencyData(data);
+  setWorkingData(data);
 
   // UI
   teamleadButton.addEventListener('click', setGradeFilter);
@@ -261,6 +306,10 @@ export const getCsv = async () => {
   euroButton.addEventListener('click', setCurrencyFilter);
   dramButton.addEventListener('click', setCurrencyFilter);
   cryptButton.addEventListener('click', setCurrencyFilter);
+
+  officeButton.addEventListener('click', setWorkingFilter);
+  hybridButton.addEventListener('click', setWorkingFilter);
+  remoteButton.addEventListener('click', setWorkingFilter);
 
 }
 

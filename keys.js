@@ -30,3 +30,23 @@ export const currency = {
   dram: "Драмы",
   crypt: "криптовалююта",
 }
+
+export const fields = {
+  gos: "Госы",
+  ecomm: "Екомм",
+  ai: "AI",
+  dating: "Dating",
+}
+
+export const format = {
+  state: "штат",
+  ip: "ИП",
+  sz: "самозанятый",
+  gph: "ГПХ",
+}
+
+export const working = {
+  office: "офис",
+  hybrid: "гибрид",
+  remote: "удалёнка",
+}
