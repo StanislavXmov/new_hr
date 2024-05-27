@@ -1,5 +1,5 @@
 import * as d3 from 'd3';
-import { Currency, Grade, Month, SalaryFinal, Working, currency, grades, working } from './keys';
+import { Currency, Field, Grade, Month, SalaryFinal, Working, currency, fields, grades, working } from './keys';
 import './style.scss';
 
 const month = ['Январь' , 'Февраль' , 'Март' , 'Апрель' , 'Май' , 'Июнь' , 'Июль' , 'Август' , 'Сентябрь' , 'Октябрь' , 'Ноябрь' , 'Декабрь'];
@@ -72,6 +72,19 @@ const remoteButton = document.getElementById('remoteButton');
 const remoteInfo = document.getElementById('remote');
 const remoteMedian = document.getElementById('remoteMedian');
 
+const gosButton = document.getElementById('gosButton');
+const gosInfo = document.getElementById('gos');
+const gosMedian = document.getElementById('gosMedian');
+const ecommButton = document.getElementById('ecommButton');
+const ecommInfo = document.getElementById('ecomm');
+const ecommMedian = document.getElementById('ecommMedian');
+const aiButton = document.getElementById('aiButton');
+const aiInfo = document.getElementById('ai');
+const aiMedian = document.getElementById('aiMedian');
+const datingButton = document.getElementById('datingButton');
+const datingInfo = document.getElementById('dating');
+const datingMedian = document.getElementById('datingMedian');
+
 
 const margin = {top: 20, right: 25, bottom: 20, left: 40};
 const width = 884 - margin.left - margin.right;
@@ -97,8 +110,13 @@ const getCurrencyData = (data, currency) => {
   return filtered;
 }
 
-const getWorkingData = (data, grade) => {
-  const filtered = data.filter(d => d[Working].toLowerCase() === grade);
+const getFieldData = (data, field) => {
+  const filtered = data.filter(d => d[Field] === field);
+  return filtered;
+}
+
+const getWorkingData = (data, work) => {
+  const filtered = data.filter(d => d[Working].toLowerCase() === work);
   return filtered;
 }
 
@@ -114,6 +132,13 @@ const setCurrencyData = (data) => {
   euroInfo.textContent = getCurrencyData(data, currency.euro).length;
   dramInfo.textContent = getCurrencyData(data, currency.dram).length;
   cryptInfo.textContent = getCurrencyData(data, currency.crypt).length;
+}
+
+const setFieldData = (data) => {
+  gosInfo.textContent = getFieldData(data, fields.gos).length;
+  ecommInfo.textContent = getFieldData(data, fields.ecomm).length;
+  aiInfo.textContent = getFieldData(data, fields.ai).length;
+  datingInfo.textContent = getFieldData(data, fields.dating).length;
 }
 
 const setWorkingData = (data) => {
@@ -160,6 +185,25 @@ const setCurrencyFilter = (e) => {
   setFilteredData(data);
 }
 
+const setFieldFilter = (e) => {
+  const field = e.target.dataset.field;
+  if (fieldFilter !== field) {
+    fieldFilter = field;
+  } else {
+    fieldFilter = null;
+  }
+  const elements = document.querySelectorAll(`[data-field]`); 
+  if (fieldFilter) {
+    elements.forEach(e => e.classList.add('notActive'));
+    const activeElements = document.querySelectorAll(`[data-field=${fieldFilter}]`);
+    activeElements.forEach(e => e.classList.remove('notActive'));
+  } else {
+    elements.forEach(e => e.classList.remove('notActive'));
+  }
+
+  setFilteredData(data);
+}
+
 const setWorkingFilter = (e) => {
   const working = e.target.dataset.working;
   if (workingFilter !== working) {
@@ -190,10 +234,14 @@ const setFilteredData = (data) => {
   if (workingFilter) {
     filtered = getWorkingData(filtered, working[workingFilter]);
   }
+  if (fieldFilter) {
+    filtered = getFieldData(filtered, fields[fieldFilter]);
+  }
 
   setGradeData(filtered);
   setCurrencyData(filtered);
   setWorkingData(filtered);
+  setFieldData(filtered);
 
   clearRect();
   setRect(svg, filtered);
@@ -294,6 +342,7 @@ export const getCsv = async () => {
   // data
   setGradeData(data);
   setCurrencyData(data);
+  setFieldData(data);
   setWorkingData(data);
 
   // UI
@@ -306,6 +355,11 @@ export const getCsv = async () => {
   euroButton.addEventListener('click', setCurrencyFilter);
   dramButton.addEventListener('click', setCurrencyFilter);
   cryptButton.addEventListener('click', setCurrencyFilter);
+
+  gosButton.addEventListener('click', setFieldFilter);
+  ecommButton.addEventListener('click', setFieldFilter);
+  aiButton.addEventListener('click', setFieldFilter);
+  datingButton.addEventListener('click', setFieldFilter);
 
   officeButton.addEventListener('click', setWorkingFilter);
   hybridButton.addEventListener('click', setWorkingFilter);
