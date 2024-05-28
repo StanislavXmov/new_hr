@@ -67,3 +67,29 @@ body {
 .dataDesc {
   font-size: 14px;
 }
+
+.medianWrapper {
+  display: flex;
+  gap: 4px;
+}
+
+.medianBlock {
+  display: inline-block;
+  height: 16px;
+  width: 50px;
+
+  background: #4E79A7;
+}
+
+.teamlead {
+  background: #B07AA1;
+}
+.senior {
+  background: #4E79A7;
+}
+.middle {
+  background: #76B7B2;
+}
+.junior {
+  background: #59A14F;
+}

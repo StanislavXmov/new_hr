@@ -38,18 +38,24 @@ let fieldFilter = null;
 let formatFilter = null;
 let workingFilter = null;
 
+let maxMedian = 0;
+
 const teamleadButton = document.getElementById('teamleadButton');
 const teamleadInfo = document.getElementById('teamlead');
 const teamleadMedian = document.getElementById('teamleadMedian');
+const teamleadMedianBlock = document.getElementById('teamleadMedianBlock');
 const seniorButton = document.getElementById('seniorButton');
 const seniorInfo = document.getElementById('senior');
 const seniorMedian = document.getElementById('seniorMedian');
+const seniorMedianBlock = document.getElementById('seniorMedianBlock');
 const middleButton = document.getElementById('middleButton');
 const middleInfo = document.getElementById('middle');
 const middleMedian = document.getElementById('middleMedian');
+const middleMedianBlock = document.getElementById('middleMedianBlock');
 const juniorButton = document.getElementById('juniorButton');
 const juniorInfo = document.getElementById('junior');
 const juniorMedian = document.getElementById('juniorMedian');
+const juniorMedianBlock = document.getElementById('juniorMedianBlock');
 
 const rubButton = document.getElementById('rubButton');
 const rubInfo = document.getElementById('rub');
@@ -124,6 +130,16 @@ const clearRect = () => {
   d3.selectAll(`[data-median]`).remove();
 }
 
+const getMedianData = (data, key, value) => {
+  let filtered = [];
+  if (key === Grade) {
+    filtered = data.filter(d => d[Grade] === value);
+  }
+  const s = filtered.map(d => d.salary.s / 1000);
+  const m = s.length > 0 ? median(s) : 0;
+  return m;
+}
+
 const getGradeData = (data, grade) => {
   const filtered = data.filter(d => d[Grade] === grade);
   return filtered;
@@ -154,6 +170,24 @@ const setGradeData = (data) => {
   seniorInfo.textContent = getGradeData(data, grades.senior).length;
   middleInfo.textContent = getGradeData(data, grades.middle).length;
   juniorInfo.textContent = getGradeData(data, grades.junior).length;
+
+  const teamleadMedianValue = getMedianData(data, Grade, grades.teamlead);
+  const seniorMedianValue = getMedianData(data, Grade, grades.senior);
+  const middleMedianValue = getMedianData(data, Grade, grades.middle);
+  const juniorMedianValue = getMedianData(data, Grade, grades.junior);
+
+  teamleadMedian.textContent = teamleadMedianValue;
+  seniorMedian.textContent = seniorMedianValue;
+  middleMedian.textContent = middleMedianValue;
+  juniorMedian.textContent = juniorMedianValue;
+
+  const wd = 50 / maxMedian;
+  teamleadMedianBlock.style.width = `${teamleadMedianValue * wd}px`;
+  seniorMedianBlock.style.width = `${seniorMedianValue * wd}px`;
+  middleMedianBlock.style.width = `${middleMedianValue * wd}px`;
+  juniorMedianBlock.style.width = `${juniorMedianValue * wd}px`;
+
+
 }
 
 const setCurrencyData = (data) => {
@@ -445,6 +479,12 @@ export const getCsv = async () => {
     d.date = month[m - 1];
     getSalary(d);
   });
+
+  // get max median
+  maxMedian = Math.max(getMedianData(data, Grade, grades.teamlead), maxMedian);
+  maxMedian = Math.max(getMedianData(data, Grade, grades.senior), maxMedian);
+  maxMedian = Math.max(getMedianData(data, Grade, grades.middle), maxMedian);
+  maxMedian = Math.max(getMedianData(data, Grade, grades.junior), maxMedian);
 
   svg = d3.select("#graph1")
     .append("svg")
