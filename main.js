@@ -119,6 +119,7 @@ const axis2 = {
 
 const clearRect = () => {
   d3.selectAll(`[data-rect]`).remove();
+  d3.selectAll(`[data-graph2]`).remove();
   d3.selectAll(`[data-median]`).remove();
 }
 
@@ -302,6 +303,7 @@ const setFilteredData = (data) => {
 
   clearRect();
   setRect(svg, filtered);
+  setGraph2(filtered);
 }
 
 const setRect = (svg, data) => {
@@ -346,8 +348,7 @@ const setRect = (svg, data) => {
         );
 }
 
-const setGraph2 = (svg, data) => {
-  console.log(data);
+const setGraph2 = (data) => {
   const mappedByDates = {};
   const setCounter = (date, grade) => {
     if (grade === grades.teamlead) {
@@ -391,6 +392,7 @@ const setGraph2 = (svg, data) => {
       .range([0, width2])
       .padding([0.0])
   svg2.append("g")
+    .attr("data-graph2", true)
     .attr("transform",`translate(0,${height2})`)
     .call(d3.axisBottom(x).tickSizeOuter(0));
 
@@ -398,6 +400,7 @@ const setGraph2 = (svg, data) => {
     .domain([0, maxH])
     .range([ height2, 0 ]);
   svg2.append("g")
+    .attr("data-graph2", true)
     .call(d3.axisLeft(y));
 
   const color = d3.scaleOrdinal()
@@ -413,6 +416,7 @@ const setGraph2 = (svg, data) => {
     .keys(['junior', 'middle', 'senior', 'teamlead'])(mappedByDatesList);
   
   svg2.append("g")
+    .attr("data-graph2", true)
     .selectAll("g")
     .data(stackedData)
     .enter().append("g")
@@ -483,7 +487,7 @@ export const getCsv = async () => {
   axis.yLinear = yLinear;
 
   setRect(svg, data);
-  setGraph2(svg, data);
+  setGraph2(data);
 
   // data
   setGradeData(data);
