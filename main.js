@@ -1,4 +1,5 @@
 import * as d3 from 'd3';
+import { median } from 'mathjs';
 import { Currency, Field, Format, Grade, Month, SalaryFinal, Working, currency, fields, format, gradeColors, grades, working } from './keys';
 import './style.scss';
 
@@ -328,10 +329,12 @@ const setRect = (svg, data) => {
     if (dataMapedObject[d.date]) {
       dataMapedObject[d.date].value += d.salary.s;
       dataMapedObject[d.date].counter++;
+      dataMapedObject[d.date].values.push(d.salary.s);
     } else {
       dataMapedObject[d.date] = {
         value: d.salary.s,
         counter: 1,
+        values: [d.salary.s],
       }
     }
   });
@@ -344,7 +347,8 @@ const setRect = (svg, data) => {
       .attr("stroke-width", 2)
       .attr("d", d3.line()
         .x(d => axis.x(d[0]) + 34.125)
-        .y(d => axis.yLinear(d[1].value / d[1].counter / 1000))
+        // .y(d => axis.yLinear(d[1].value / d[1].counter / 1000))
+        .y(d => axis.yLinear(median(d[1].values) / 1000))
         );
 }
 
