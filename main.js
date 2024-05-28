@@ -1,5 +1,5 @@
 import * as d3 from 'd3';
-import { Currency, Field, Format, Grade, Month, SalaryFinal, Working, currency, fields, format, grades, working } from './keys';
+import { Currency, Field, Format, Grade, Month, SalaryFinal, Working, currency, fields, format, gradeColors, grades, working } from './keys';
 import './style.scss';
 
 const month = ['Январь' , 'Февраль' , 'Март' , 'Апрель' , 'Май' , 'Июнь' , 'Июль' , 'Август' , 'Сентябрь' , 'Октябрь' , 'Ноябрь' , 'Декабрь'];
@@ -30,6 +30,7 @@ const getSalary = (d) => {
 
 let data;
 let svg;
+let svg2;
 let gradeFilter = null;
 let currencyFilter = null;
 let fieldFilter = null;
@@ -103,7 +104,15 @@ const margin = {top: 20, right: 25, bottom: 20, left: 40};
 const width = 884 - margin.left - margin.right;
 const height = 480 - margin.top - margin.bottom;
 
+const width2 = 884 - margin.left - margin.right;
+const height2 = 200 - margin.top - margin.bottom; 
+
 const axis = {
+  x: null,
+  y: null,
+}
+
+const axis2 = {
   x: null,
   y: null,
 }
@@ -337,6 +346,87 @@ const setRect = (svg, data) => {
         );
 }
 
+const setGraph2 = (svg, data) => {
+  console.log(data);
+  const mappedByDates = {};
+  const setCounter = (date, grade) => {
+    if (grade === grades.teamlead) {
+      mappedByDates[date].teamlead++;
+    } else if (grade === grades.senior) {
+      mappedByDates[date].senior++;
+    } else if (grade === grades.middle) {
+      mappedByDates[date].middle++;
+    } else if (grade === grades.junior) {
+      mappedByDates[date].junior++;
+    }
+  }
+  data.forEach(d => {
+    if (mappedByDates[d.date]) {
+      setCounter(d.date, d[Grade]);
+    } else {
+      mappedByDates[d.date] = {
+        // month: d.Month,
+        group: d.date,
+        teamlead: 0,
+        senior: 0,
+        middle: 0,
+        junior: 0,
+      };
+      setCounter(d.date, d[Grade]);
+    }
+  });
+
+  const mappedByDatesList = Object.values(mappedByDates);
+  const subgroups = ["тимлид", "сеньор", "миддл", "джун"];
+  const groups = month;
+
+  let maxH = 0;
+  mappedByDatesList.forEach(d => {
+    const s = d.teamlead + d.senior + d.middle + d.junior;
+    maxH = Math.max(s, maxH);
+  });
+
+  const x = d3.scaleBand()
+      .domain(groups)
+      .range([0, width2])
+      .padding([0.0])
+  svg2.append("g")
+    .attr("transform",`translate(0,${height2})`)
+    .call(d3.axisBottom(x).tickSizeOuter(0));
+
+  const y = d3.scaleLinear()
+    .domain([0, maxH])
+    .range([ height2, 0 ]);
+  svg2.append("g")
+    .call(d3.axisLeft(y));
+
+  const color = d3.scaleOrdinal()
+    .domain(subgroups)
+    .range([
+      gradeColors.junior,
+      gradeColors.middle,
+      gradeColors.senior,
+      gradeColors.teamlead,
+    ]);
+
+  const stackedData = d3.stack()
+    .keys(['junior', 'middle', 'senior', 'teamlead'])(mappedByDatesList);
+  
+  svg2.append("g")
+    .selectAll("g")
+    .data(stackedData)
+    .enter().append("g")
+      .attr("fill", d => color(d.key))
+      .selectAll("rect")
+      .data(d => d)
+      .enter().append("rect")
+        .attr("x", d => x(d.data.group))
+        .attr("y", d => y(d[1]))
+        .attr("height", d => y(d[0]) - y(d[1]))
+        .attr("width",x.bandwidth());
+
+}
+
 export const getCsv = async () => {
   data = await d3.csv('./Dataset HR - XYZ разработчик 2023 год.csv');
   data.sort((a, b) => getMonth(a) - getMonth(b));
@@ -352,6 +442,13 @@ export const getCsv = async () => {
     .append("svg")
       .attr("width", width + margin.left + margin.right)
       .attr("height", height + margin.top + margin.bottom)
+    .append("g")
+      .attr("transform", `translate(${margin.left},${margin.top})`);
+  
+  svg2 = d3.select("#graph2")
+    .append("svg")
+      .attr("width", width2 + margin.left + margin.right)
+      .attr("height", height2 + margin.top + margin.bottom)
     .append("g")
       .attr("transform", `translate(${margin.left},${margin.top})`);
 
@@ -386,6 +483,7 @@ export const getCsv = async () => {
   axis.yLinear = yLinear;
 
   setRect(svg, data);
+  setGraph2(svg, data);
 
   // data
   setGradeData(data);
@@ -420,4 +518,3 @@ export const getCsv = async () => {
   remoteButton.addEventListener('click', setWorkingFilter);
 
 }
-

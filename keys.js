@@ -24,6 +24,13 @@ export const grades = {
   junior: "джун",
 }
 
+export const gradeColors = {
+  teamlead: "#B07AA1",
+  senior: "#4E79A7",
+  middle: "#76B7B2",
+  junior: "#59A14F",
+}
+
 export const currency = {
   rub: "рубли",
   euro: "евро",
