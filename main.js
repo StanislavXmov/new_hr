@@ -60,15 +60,19 @@ const juniorMedianBlock = document.getElementById('juniorMedianBlock');
 const rubButton = document.getElementById('rubButton');
 const rubInfo = document.getElementById('rub');
 const rubMedian = document.getElementById('rubMedian');
+const rubMedianBlock = document.getElementById('rubMedianBlock');
 const euroButton = document.getElementById('euroButton');
 const euroInfo = document.getElementById('euro');
 const euroMedian = document.getElementById('euroMedian');
+const euroMedianBlock = document.getElementById('euroMedianBlock');
 const dramButton = document.getElementById('dramButton');
 const dramInfo = document.getElementById('dram');
 const dramMedian = document.getElementById('dramMedian');
+const dramMedianBlock = document.getElementById('dramMedianBlock');
 const cryptButton = document.getElementById('cryptButton');
 const cryptInfo = document.getElementById('crypt');
 const cryptMedian = document.getElementById('cryptMedian');
+const cryptMedianBlock = document.getElementById('cryptMedianBlock');
 
 const officeButton = document.getElementById('officeButton');
 const officeInfo = document.getElementById('office');
@@ -135,6 +139,9 @@ const getMedianData = (data, key, value) => {
   if (key === Grade) {
     filtered = data.filter(d => d[Grade] === value);
   }
+  if (key === Currency) {
+    filtered = data.filter(d => d[Currency] === value);
+  }
   const s = filtered.map(d => d.salary.s / 1000);
   const m = s.length > 0 ? median(s) : 0;
   return m;
@@ -186,8 +193,6 @@ const setGradeData = (data) => {
   seniorMedianBlock.style.width = `${seniorMedianValue * wd}px`;
   middleMedianBlock.style.width = `${middleMedianValue * wd}px`;
   juniorMedianBlock.style.width = `${juniorMedianValue * wd}px`;
-
-
 }
 
 const setCurrencyData = (data) => {
@@ -195,6 +200,22 @@ const setCurrencyData = (data) => {
   euroInfo.textContent = getCurrencyData(data, currency.euro).length;
   dramInfo.textContent = getCurrencyData(data, currency.dram).length;
   cryptInfo.textContent = getCurrencyData(data, currency.crypt).length;
+
+  const rubMedianValue = getMedianData(data, Currency, currency.rub);
+  const euroMedianValue = getMedianData(data, Currency, currency.euro);
+  const dramMedianValue = getMedianData(data, Currency, currency.dram);
+  const cryptMedianValue = getMedianData(data, Currency, currency.crypt);
+
+  rubMedian.textContent = rubMedianValue;
+  euroMedian.textContent = euroMedianValue;
+  dramMedian.textContent = dramMedianValue;
+  cryptMedian.textContent = cryptMedianValue;
+
+  const wd = 50 / maxMedian;
+  rubMedianBlock.style.width = `${rubMedianValue * wd}px`;
+  euroMedianBlock.style.width = `${euroMedianValue * wd}px`;
+  dramMedianBlock.style.width = `${dramMedianValue * wd}px`;
+  cryptMedianBlock.style.width = `${cryptMedianValue * wd}px`;
 }
 
 const setFieldData = (data) => {
