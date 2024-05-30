@@ -38,6 +38,13 @@ let fieldFilter = null;
 let formatFilter = null;
 let workingFilter = null;
 
+let isMaxLine = true;
+let isMedianLine = true;
+let isMinLine = true;
+const maxLine = 'maxLine';
+const medianLine = 'medianLine';
+const minLine = 'minLine';
+
 let maxMedian = 0;
 
 const teamleadButton = document.getElementById('teamleadButton');
@@ -120,6 +127,10 @@ const gphButton = document.getElementById('gphButton');
 const gphInfo = document.getElementById('gph');
 const gphMedian = document.getElementById('gphMedian');
 const gphMedianBlock = document.getElementById('gphMedianBlock');
+
+const maxLineCheckbox = document.getElementById('maxLine');
+const medianLineCheckbox = document.getElementById('medianLine');
+const minLineCheckbox = document.getElementById('minLine');
 
 
 const margin = {top: 20, right: 25, bottom: 20, left: 40};
@@ -429,6 +440,29 @@ const setFilteredData = (data) => {
   setGraph2(filtered);
 }
 
+const setLineFilter = (e) => {
+  const line = e.target.dataset.checkbox;
+  const checked = e.target.checked;
+  
+  if (checked) {
+    if (line === maxLine) {
+      console.log(maxLine);
+    } else if (line === medianLine) {
+      console.log(medianLine);
+    } else if (line === minLine) {
+      console.log(minLine);
+    }
+  } else {
+    if (line === maxLine) {
+      d3.selectAll(`[data-max]`).remove();
+    } else if (line === medianLine) {
+      d3.selectAll(`[data-median]`).remove();
+    } else if (line === minLine) {
+      d3.selectAll(`[data-min]`).remove();
+    }
+  }
+}
+
 const setRect = (svg, data) => {
   svg.selectAll()
     .data(data)
@@ -491,7 +525,7 @@ const setRect = (svg, data) => {
     .datum(Object.entries(dataMapedObject))
     .attr("data-max", true)
     .attr("fill", "none")
-    .attr("stroke", "#8a8a8a")
+    .attr("stroke", "#424242")
     .attr("stroke-width", 2)
     .attr("d", d3.line()
       .x(d => axis.x(d[0]) + 34.125)
@@ -677,5 +711,9 @@ export const getCsv = async () => {
   officeButton.addEventListener('click', setWorkingFilter);
   hybridButton.addEventListener('click', setWorkingFilter);
   remoteButton.addEventListener('click', setWorkingFilter);
+
+  maxLineCheckbox.addEventListener('change', setLineFilter);
+  medianLineCheckbox.addEventListener('change', setLineFilter);
+  minLineCheckbox.addEventListener('change', setLineFilter);
 
 }

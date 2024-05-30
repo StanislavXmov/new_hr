@@ -93,3 +93,40 @@ body {
 .junior {
   background: #59A14F;
 }
+
+
+.lines {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.lineWrapper {
+  margin: 0px 0px 0px 4px;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.line {
+  width: 22px;
+  height: 2px;
+  background: #000000;
+}
+.maxLine {
+  background: #424242;
+}
+.medianLine {
+  background: #000000;
+}
+.minLine {
+  background: #c7c7c7;
+}
+
+.lineLabel {
+  width: 86px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  font-size: 12px;
+}
