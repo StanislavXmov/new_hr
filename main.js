@@ -153,6 +153,15 @@ const getMedianData = (data, key, value) => {
   if (key === Currency) {
     filtered = data.filter(d => d[Currency] === value);
   }
+  if (key === Field) {
+    filtered = data.filter(d => d[Field] === value);
+  }
+  if (key === Format) {
+    filtered = data.filter(d => d[Format] === value);
+  }
+  if (key === Working) {
+    filtered = data.filter(d => d[Working] === value);
+  }
   const s = filtered.map(d => d.salary.s / 1000);
   const m = s.length > 0 ? median(s) : 0;
   return m;
@@ -234,6 +243,22 @@ const setFieldData = (data) => {
   ecommInfo.textContent = getFieldData(data, fields.ecomm).length;
   aiInfo.textContent = getFieldData(data, fields.ai).length;
   datingInfo.textContent = getFieldData(data, fields.dating).length;
+
+  const gosMedianValue = getMedianData(data, Field, fields.gos);
+  const ecommMedianValue = getMedianData(data, Field, fields.ecomm);
+  const aiMedianValue = getMedianData(data, Field, fields.ai);
+  const datingMedianValue = getMedianData(data, Field, fields.dating);
+
+  gosMedian.textContent = gosMedianValue;
+  ecommMedian.textContent = ecommMedianValue;
+  aiMedian.textContent = aiMedianValue;
+  datingMedian.textContent = datingMedianValue;
+
+  const wd = 50 / maxMedian;
+  gosMedianBlock.style.width = `${gosMedianValue * wd}px`;
+  ecommMedianBlock.style.width = `${ecommMedianValue * wd}px`;
+  aiMedianBlock.style.width = `${aiMedianValue * wd}px`;
+  datingMedianBlock.style.width = `${datingMedianValue * wd}px`;
 }
 
 const setFormatData = (data) => {
@@ -241,12 +266,41 @@ const setFormatData = (data) => {
   ipInfo.textContent = getFormatData(data, format.ip).length;
   szInfo.textContent = getFormatData(data, format.sz).length;
   gphInfo.textContent = getFormatData(data, format.gph).length;
+
+  const stateMedianValue = getMedianData(data, Format, format.state);
+  const ipMedianValue = getMedianData(data, Format, format.ip);
+  const szMedianValue = getMedianData(data, Format, format.sz);
+  const gphMedianValue = getMedianData(data, Format, format.gph);
+
+  stateMedian.textContent = stateMedianValue;
+  ipMedian.textContent = ipMedianValue;
+  szMedian.textContent = szMedianValue;
+  gphMedian.textContent = gphMedianValue;
+
+  const wd = 50 / maxMedian;
+  stateMedianBlock.style.width = `${stateMedianValue * wd}px`;
+  ipMedianBlock.style.width = `${ipMedianValue * wd}px`;
+  szMedianBlock.style.width = `${szMedianValue * wd}px`;
+  gphMedianBlock.style.width = `${gphMedianValue * wd}px`;
 }
 
 const setWorkingData = (data) => {
   officeInfo.textContent = getWorkingData(data, working.office).length;
   hybridInfo.textContent = getWorkingData(data, working.hybrid).length;
   remoteInfo.textContent = getWorkingData(data, working.remote).length;
+
+  const officeMedianValue = getMedianData(data, Working, working.office);
+  const hybridMedianValue = getMedianData(data, Working, working.hybrid);
+  const remoteMedianValue = getMedianData(data, Working, working.remote);
+
+  officeMedian.textContent = officeMedianValue;
+  hybridMedian.textContent = hybridMedianValue;
+  remoteMedian.textContent = remoteMedianValue;
+
+  const wd = 50 / maxMedian;
+  officeMedianBlock.style.width = `${officeMedianValue * wd}px`;
+  hybridMedianBlock.style.width = `${hybridMedianValue * wd}px`;
+  remoteMedianBlock.style.width = `${remoteMedianValue * wd}px`;
 }
 
 const setGradeFilter = (e) => {
