@@ -30,6 +30,7 @@ const getSalary = (d) => {
 }
 
 let data;
+let filtered = [];
 let svg;
 let svg2;
 let gradeFilter = null;
@@ -412,7 +413,7 @@ const setWorkingFilter = (e) => {
 }
 
 const setFilteredData = (data) => {
-  let filtered = data;
+  filtered = data;
   if (gradeFilter) {
     filtered = getGradeData(filtered, grades[gradeFilter]);
   }
@@ -446,18 +447,22 @@ const setLineFilter = (e) => {
   
   if (checked) {
     if (line === maxLine) {
-      console.log(maxLine);
+      isMaxLine = true;
     } else if (line === medianLine) {
-      console.log(medianLine);
+      isMedianLine = true;
     } else if (line === minLine) {
-      console.log(minLine);
+      isMinLine = true;
     }
+    setLines(filtered);
   } else {
     if (line === maxLine) {
+      isMaxLine = false;
       d3.selectAll(`[data-max]`).remove();
     } else if (line === medianLine) {
+      isMedianLine = false;
       d3.selectAll(`[data-median]`).remove();
     } else if (line === minLine) {
+      isMinLine = false;
       d3.selectAll(`[data-min]`).remove();
     }
   }
@@ -478,7 +483,11 @@ const setRect = (svg, data) => {
       .style("stroke-width", 4)
       .style("stroke", "none")
       .style("opacity", 0.4);
+    
+  setLines(data);
+}
 
+const setLines = (data) => {
   const dataMapedObject = {};
 
   data.forEach(d => {
@@ -496,41 +505,47 @@ const setRect = (svg, data) => {
   });
 
   // median
-  svg.append("path")
-    .datum(Object.entries(dataMapedObject))
-    .attr("data-median", true)
-    .attr("fill", "none")
-    .attr("stroke", "black")
-    .attr("stroke-width", 2)
-    .attr("d", d3.line()
-      .x(d => axis.x(d[0]) + 34.125)
-      // .y(d => axis.yLinear(d[1].value / d[1].counter / 1000))
-      .y(d => axis.yLinear(median(d[1].values) / 1000) + 11)
-      );
+  if (isMedianLine) {
+    svg.append("path")
+      .datum(Object.entries(dataMapedObject))
+      .attr("data-median", true)
+      .attr("fill", "none")
+      .attr("stroke", "black")
+      .attr("stroke-width", 2)
+      .attr("d", d3.line()
+        .x(d => axis.x(d[0]) + 34.125)
+        // .y(d => axis.yLinear(d[1].value / d[1].counter / 1000))
+        .y(d => axis.yLinear(median(d[1].values) / 1000) + 11)
+        );
+  }
 
   // min
-  svg.append("path")
-    .datum(Object.entries(dataMapedObject))
-    .attr("data-min", true)
-    .attr("fill", "none")
-    .attr("stroke", "#8a8a8a")
-    .attr("stroke-width", 2)
-    .attr("d", d3.line()
-      .x(d => axis.x(d[0]) + 34.125)
-      .y(d => axis.yLinear(Math.min(...d[1].values) / 1000) + 11)
-      );
+  if (isMinLine) {
+    svg.append("path")
+      .datum(Object.entries(dataMapedObject))
+      .attr("data-min", true)
+      .attr("fill", "none")
+      .attr("stroke", "#8a8a8a")
+      .attr("stroke-width", 2)
+      .attr("d", d3.line()
+        .x(d => axis.x(d[0]) + 34.125)
+        .y(d => axis.yLinear(Math.min(...d[1].values) / 1000) + 11)
+        );
+  }
 
   // max
-  svg.append("path")
-    .datum(Object.entries(dataMapedObject))
-    .attr("data-max", true)
-    .attr("fill", "none")
-    .attr("stroke", "#424242")
-    .attr("stroke-width", 2)
-    .attr("d", d3.line()
-      .x(d => axis.x(d[0]) + 34.125)
-      .y(d => axis.yLinear(Math.max(...d[1].values) / 1000) + 11)
-      );
+  if (isMaxLine) {
+    svg.append("path")
+      .datum(Object.entries(dataMapedObject))
+      .attr("data-max", true)
+      .attr("fill", "none")
+      .attr("stroke", "#424242")
+      .attr("stroke-width", 2)
+      .attr("d", d3.line()
+        .x(d => axis.x(d[0]) + 34.125)
+        .y(d => axis.yLinear(Math.max(...d[1].values) / 1000) + 11)
+        );
+  }
 }
 
 const setGraph2 = (data) => {
@@ -626,6 +641,7 @@ export const getCsv = async () => {
     d.date = month[m - 1];
     getSalary(d);
   });
+  filtered = data;
 
   // get max median
   maxMedian = Math.max(getMedianData(data, Grade, grades.teamlead), maxMedian);
