@@ -1,5 +1,5 @@
 import * as d3 from 'd3';
-import { median } from 'mathjs';
+import { median, quantileSeq } from 'mathjs';
 import { Currency, Field, Format, Grade, Month, SalaryFinal, Working, currency, fields, format, gradeColors, grades, working } from './keys';
 import './style.scss';
 
@@ -39,12 +39,16 @@ let fieldFilter = null;
 let formatFilter = null;
 let workingFilter = null;
 
-let isMaxLine = true;
+let isMaxLine = false;
 let isMedianLine = true;
-let isMinLine = true;
+let isMinLine = false;
+let isQuantile5 = true;
+let isQuantile95 = true;
 const maxLine = 'maxLine';
 const medianLine = 'medianLine';
 const minLine = 'minLine';
+const quantile5 = 'quantile5';
+const quantile95 = 'quantile95';
 
 let maxMedian = 0;
 
@@ -132,6 +136,8 @@ const gphMedianBlock = document.getElementById('gphMedianBlock');
 const maxLineCheckbox = document.getElementById('maxLine');
 const medianLineCheckbox = document.getElementById('medianLine');
 const minLineCheckbox = document.getElementById('minLine');
+const quantile95Checkbox = document.getElementById('quantile95');
+const quantile5Checkbox = document.getElementById('quantile5');
 
 
 const margin = {top: 20, right: 25, bottom: 20, left: 40};
@@ -157,6 +163,8 @@ const clearRect = () => {
   d3.selectAll(`[data-median]`).remove();
   d3.selectAll(`[data-min]`).remove();
   d3.selectAll(`[data-max]`).remove();
+  d3.selectAll(`[data-quantile95]`).remove();
+  d3.selectAll(`[data-quantile5]`).remove();
 }
 
 const getMedianData = (data, key, value) => {
@@ -452,6 +460,10 @@ const setLineFilter = (e) => {
       isMedianLine = true;
     } else if (line === minLine) {
       isMinLine = true;
+    } else if (line === quantile5) {
+      isQuantile5 = true;
+    } else if (line === quantile95) {
+      isQuantile95 = true;
     }
     setLines(filtered);
   } else {
@@ -464,6 +476,12 @@ const setLineFilter = (e) => {
     } else if (line === minLine) {
       isMinLine = false;
       d3.selectAll(`[data-min]`).remove();
+    } else if (line === quantile5) {
+      isQuantile5 = false;
+      d3.selectAll(`[data-quantile5]`).remove();
+    } else if (line === quantile95) {
+      isQuantile95 = false;
+      d3.selectAll(`[data-quantile95]`).remove();
     }
   }
 }
@@ -544,6 +562,34 @@ const setLines = (data) => {
       .attr("d", d3.line()
         .x(d => axis.x(d[0]) + 34.125)
         .y(d => axis.yLinear(Math.max(...d[1].values) / 1000) + 11)
+        );
+  }
+
+  // quantileSeq 0.05
+  if (isQuantile5) {
+    svg.append("path")
+      .datum(Object.entries(dataMapedObject))
+      .attr("data-quantile5", true)
+      .attr("fill", "none")
+      .attr("stroke", "#000000")
+      .attr("stroke-width", 2)
+      .attr("d", d3.line()
+        .x(d => axis.x(d[0]) + 34.125)
+        .y(d => axis.yLinear(quantileSeq(d[1].values, 0.05) / 1000) + 11)
+        );
+  }
+
+  // quantileSeq 0.95
+  if (isQuantile95) {
+    svg.append("path")
+      .datum(Object.entries(dataMapedObject))
+      .attr("data-quantile95", true)
+      .attr("fill", "none")
+      .attr("stroke", "#000000")
+      .attr("stroke-width", 2)
+      .attr("d", d3.line()
+        .x(d => axis.x(d[0]) + 34.125)
+        .y(d => axis.yLinear(quantileSeq(d[1].values, 0.95) / 1000) + 11)
         );
   }
 }
@@ -731,5 +777,7 @@ export const getCsv = async () => {
   maxLineCheckbox.addEventListener('change', setLineFilter);
   medianLineCheckbox.addEventListener('change', setLineFilter);
   minLineCheckbox.addEventListener('change', setLineFilter);
+  quantile95Checkbox.addEventListener('change', setLineFilter);
+  quantile5Checkbox.addEventListener('change', setLineFilter);
 
 }
